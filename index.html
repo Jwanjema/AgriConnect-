@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgriConnect Kenya</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Landing Page -->
+  <div id="landing" class="active">
+    <h1>AgriConnect Kenya</h1>
+    <p>Direct from Kenyan farms to your table</p>
+    <div class="buttons">
+      <button id="farmer-btn">Enter as Farmer</button>
+      <button id="buyer-btn">Enter as Buyer</button>
+    </div>
+  </div>
+
+  <!-- Farmer View -->
+  <div id="farmer-view" class="hidden">
+    <h2>Farmer Dashboard</h2>
+    <button class="back-btn">← Back</button>
+    
+    <form id="add-product-form">
+      <h3>Add Your Product</h3>
+      <input type="text" id="product-name" placeholder="Product name (e.g., Sukuma Wiki)" required>
+      <input type="number" id="product-price" placeholder="Price (KSH)" step="1" required>
+      <select id="product-category">
+        <option value="vegetables">Vegetables</option>
+        <option value="fruits">Fruits</option>
+        <option value="grains">Grains</option>
+        <option value="tubers">Tubers</option>
+      </select>
+      <button type="submit">Add Product</button>
+    </form>
+
+    <div id="farmer-products">
+      <h3>Your Products</h3>
+      <div class="products-list" id="farmer-products-list"></div>
+    </div>
+  </div>
+
+  <!-- Buyer View -->
+  <div id="buyer-view" class="hidden">
+    <h2>Fresh Produce Marketplace</h2>
+    <button class="back-btn">← Back</button>
+    
+    <div class="search-box">
+      <input type="text" id="search" placeholder="Search products...">
+    </div>
+
+    <div class="seasonal-calendar">
+      <h3>Seasonal Calendar</h3>
+      <div class="calendar-months"></div>
+      <div class="seasonal-crops"></div>
+    </div>
+
+    <div class="products-list" id="buyer-products-list"></div>
+
+    <div class="cart">
+      <h3>Your Cart</h3>
+      <ul id="cart-items"></ul>
+      <p>Total: Ksh <span id="cart-total">0</span></p>
+      <div class="cart-actions">
+        <button id="proceed-to-payment" class="payment-btn">Proceed to Payment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Product Modal -->
+  <div id="edit-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h3>Edit Product</h3>
+      <form id="edit-product-form">
+        <input type="hidden" id="edit-product-id">
+        <div class="form-group">
+          <label for="edit-product-name">Product Name</label>
+          <input type="text" id="edit-product-name" required>
+        </div>
+        <div class="form-group">
+          <label for="edit-product-price">Price (KSH)</label>
+          <input type="number" id="edit-product-price" step="1" required>
+        </div>
+        <div class="form-group">
+          <label for="edit-product-category">Category</label>
+          <select id="edit-product-category">
+            <option value="vegetables">Vegetables</option>
+            <option value="fruits">Fruits</option>
+            <option value="grains">Grains</option>
+            <option value="tubers">Tubers</option>
+          </select>
+        </div>
+        <button type="submit" class="primary-btn">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
