@@ -45,32 +45,45 @@ const seasonalCrops = {
   december: ["Peas", "Beans", "Spinach"]
 };
 
-// Initialize
+// Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
-  // Clear all content areas
-  farmerProductsList.innerHTML = '';
-  buyerProductsList.innerHTML = '';
-  cartItems.innerHTML = '';
-  document.querySelector('.calendar-months').innerHTML = '';
-  document.querySelector('.seasonal-crops').innerHTML = '';
-  
-  // Set initial view states
-  landingPage.classList.remove('hidden');
-  farmerView.classList.add('hidden');
-  buyerView.classList.add('hidden');
-  editModal.classList.add('hidden');
-  
   loadProducts();
   setupEventListeners();
+  showView('landing');
 });
 
+// View Management
+function showView(viewName) {
+  // Hide all views
+  document.querySelectorAll('.view').forEach(view => {
+    view.classList.remove('active');
+    view.classList.add('hidden');
+  });
+
+  // Show the requested view
+  const viewElement = document.getElementById(`${viewName}-view`) || document.getElementById(viewName);
+  if (viewElement) {
+    viewElement.classList.remove('hidden');
+    viewElement.classList.add('active');
+    
+    // Load appropriate data for the view
+    if (viewName === 'farmer') {
+      renderFarmerProducts();
+    } else if (viewName === 'buyer') {
+      renderProducts();
+      initCalendar();
+    }
+  }
+}
+
+// Event Listeners
 function setupEventListeners() {
   // Navigation
-  farmerBtn.addEventListener('click', showFarmerView);
-  buyerBtn.addEventListener('click', showBuyerView);
+  farmerBtn.addEventListener('click', () => showView('farmer'));
+  buyerBtn.addEventListener('click', () => showView('buyer'));
   
   backBtns.forEach(btn => {
-    btn.addEventListener('click', showLandingPage);
+    btn.addEventListener('click', () => showView('landing'));
   });
 
   // Forms
@@ -88,48 +101,6 @@ function setupEventListeners() {
 
   // Payment
   document.getElementById('proceed-to-payment').addEventListener('click', handlePayment);
-}
-
-// Navigation
-function showLandingPage() {
-  landingPage.classList.remove('hidden');
-  farmerView.classList.add('hidden');
-  buyerView.classList.add('hidden');
-  editModal.classList.add('hidden');
-}
-
-function showFarmerView() {
-  // Hide other views
-  landingPage.classList.add('hidden');
-  buyerView.classList.add('hidden');
-  editModal.classList.add('hidden');
-  
-  // Clear and prepare farmer view
-  farmerProductsList.innerHTML = '';
-  
-  // Show farmer view
-  farmerView.classList.remove('hidden');
-  
-  // Load farmer products
-  renderFarmerProducts();
-}
-
-function showBuyerView() {
-  // Hide other views
-  landingPage.classList.add('hidden');
-  farmerView.classList.add('hidden');
-  editModal.classList.add('hidden');
-  
-  // Clear and prepare buyer view
-  buyerProductsList.innerHTML = '';
-  document.querySelector('.seasonal-crops').innerHTML = '';
-  
-  // Show buyer view
-  buyerView.classList.remove('hidden');
-  
-  // Load marketplace and calendar
-  renderProducts();
-  initCalendar();
 }
 
 // Product Management
@@ -166,6 +137,25 @@ function handleAddProduct(e) {
 
 function saveFarmerProducts() {
   localStorage.setItem('farmerProducts', JSON.stringify(farmerProducts));
+}
+
+function renderFarmerProducts() {
+  if (farmerProducts.length === 0) {
+    farmerProductsList.innerHTML = '<p class="empty-message">You haven\'t added any products yet</p>';
+    return;
+  }
+  
+  farmerProductsList.innerHTML = farmerProducts.map(product => `
+    <div class="product-card" data-id="${product.id}">
+      <h3>${product.name}</h3>
+      <p class="price">Ksh ${product.price}</p>
+      <p class="category">${product.category}</p>
+      <div class="product-actions">
+        <button class="edit-btn" onclick="openEditModal(${product.id})">Edit</button>
+        <button class="delete-btn" onclick="deleteProduct(${product.id})">Delete</button>
+      </div>
+    </div>
+  `).join('');
 }
 
 function openEditModal(productId) {
@@ -209,25 +199,6 @@ function deleteProduct(productId) {
     renderFarmerProducts();
     renderProducts();
   }
-}
-
-function renderFarmerProducts() {
-  if (farmerProducts.length === 0) {
-    farmerProductsList.innerHTML = '<p class="empty-message">You haven\'t added any products yet</p>';
-    return;
-  }
-  
-  farmerProductsList.innerHTML = farmerProducts.map(product => `
-    <div class="product-card" data-id="${product.id}">
-      <h3>${product.name}</h3>
-      <p class="price">Ksh ${product.price}</p>
-      <p class="category">${product.category}</p>
-      <div class="product-actions">
-        <button class="edit-btn" onclick="openEditModal(${product.id})">Edit</button>
-        <button class="delete-btn" onclick="deleteProduct(${product.id})">Delete</button>
-      </div>
-    </div>
-  `).join('');
 }
 
 // Buyer Marketplace
@@ -277,7 +248,7 @@ function filterProducts() {
     `).join('');
 }
 
-// Calendar Functions
+// Seasonal Calendar
 function initCalendar() {
   const monthsContainer = document.querySelector('.calendar-months');
   monthsContainer.innerHTML = '';
@@ -292,7 +263,6 @@ function initCalendar() {
   // Show current month by default
   const currentMonth = new Date().toLocaleString('default', { month: 'long' }).toLowerCase();
   showCropsForMonth(currentMonth);
-  highlightCurrentMonth(currentMonth);
 }
 
 function showCropsForMonth(month) {
@@ -300,19 +270,18 @@ function showCropsForMonth(month) {
   cropsContainer.innerHTML = seasonalCrops[month].map(crop => `
     <div class="seasonal-crop">${crop}</div>
   `).join('');
-  
-  highlightCurrentMonth(month);
-}
-
-function highlightCurrentMonth(month) {
-  document.querySelectorAll('.calendar-months button').forEach(button => {
-    button.classList.toggle('active', button.textContent.toLowerCase() === month);
-  });
 }
 
 // Cart Management
 function addToCart(product) {
-  cart.push(product);
+  const existingItem = cart.find(item => item.id === product.id);
+  
+  if (existingItem) {
+    existingItem.quantity = (existingItem.quantity || 1) + 1;
+  } else {
+    cart.push({ ...product, quantity: 1 });
+  }
+  
   saveCart();
   updateCart();
 }
@@ -332,22 +301,24 @@ function updateCart() {
     '<li class="empty-message">Your cart is empty</li>' :
     cart.map((item, index) => `
       <li>
-        <span>${item.name}</span>
-        <span>Ksh ${item.price}</span>
+        <span>${item.name} ${item.quantity > 1 ? `(×${item.quantity})` : ''}</span>
+        <span>Ksh ${item.price * (item.quantity || 1)}</span>
         <button class="remove-from-cart" onclick="removeFromCart(${index})">Remove</button>
       </li>
     `).join('');
   
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
-  cartTotal.textContent = total;
+  const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+  cartTotal.textContent = `Ksh ${total}`;
 }
 
 function handlePayment() {
   if (cart.length === 0) {
     alert("Your cart is empty! Add some products first.");
   } else {
-    alert("Payment gateway would be integrated here!\n\nTotal: Ksh " + 
-      cart.reduce((sum, item) => sum + item.price, 0));
+    alert(`Payment of ${cartTotal.textContent} processed successfully!`);
+    cart = [];
+    saveCart();
+    updateCart();
   }
 }
 

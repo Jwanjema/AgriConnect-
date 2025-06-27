@@ -3,67 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgriConnect Kenya</title>
+  <title>🌱 AgriConnect Kenya</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <!-- Landing Page -->
-  <div id="landing" class="active">
-    <h1>AgriConnect Kenya</h1>
-    <p>Direct from Kenyan farms to your table</p>
-    <div class="buttons">
-      <button id="farmer-btn">Enter as Farmer</button>
-      <button id="buyer-btn">Enter as Buyer</button>
+  <div id="landing" class="view active">
+    <div class="landing-content">
+      <h1>🌱 AgriConnect Kenya</h1>
+      <p class="tagline">Direct from Kenyan farms to your table</p>
+      <div class="buttons">
+        <button id="farmer-btn" class="btn farmer-btn">Enter as Farmer</button>
+        <button id="buyer-btn" class="btn buyer-btn">Enter as Buyer</button>
+      </div>
     </div>
   </div>
 
   <!-- Farmer View -->
-  <div id="farmer-view" class="hidden">
-    <h2>Farmer Dashboard</h2>
-    <button class="back-btn">← Back</button>
-    
-    <form id="add-product-form">
-      <h3>Add Your Product</h3>
-      <input type="text" id="product-name" placeholder="Product name (e.g., Sukuma Wiki)" required>
-      <input type="number" id="product-price" placeholder="Price (KSH)" step="1" required>
-      <select id="product-category">
-        <option value="vegetables">Vegetables</option>
-        <option value="fruits">Fruits</option>
-        <option value="grains">Grains</option>
-        <option value="tubers">Tubers</option>
-      </select>
-      <button type="submit">Add Product</button>
-    </form>
+  <div id="farmer-view" class="view hidden">
+    <div class="dashboard-container">
+      <div class="dashboard-header">
+        <button class="back-btn">← Back to Home</button>
+        <h2>Farmer Dashboard</h2>
+      </div>
+      
+      <form id="add-product-form" class="product-form">
+        <h3>Add Your Product</h3>
+        <input type="text" id="product-name" placeholder="Product name (e.g., Sukuma Wiki)" required>
+        <input type="number" id="product-price" placeholder="Price (KSH)" step="1" required>
+        <select id="product-category">
+          <option value="vegetables">Vegetables</option>
+          <option value="fruits">Fruits</option>
+          <option value="grains">Grains</option>
+          <option value="tubers">Tubers</option>
+        </select>
+        <button type="submit" class="btn primary-btn">Add Product</button>
+      </form>
 
-    <div id="farmer-products">
-      <h3>Your Products</h3>
-      <div class="products-list" id="farmer-products-list"></div>
+      <div id="farmer-products">
+        <h3>Your Products</h3>
+        <div class="products-list" id="farmer-products-list"></div>
+      </div>
     </div>
   </div>
 
   <!-- Buyer View -->
-  <div id="buyer-view" class="hidden">
-    <h2>Fresh Produce Marketplace</h2>
-    <button class="back-btn">← Back</button>
-    
-    <div class="search-box">
-      <input type="text" id="search" placeholder="Search products...">
-    </div>
+  <div id="buyer-view" class="view hidden">
+    <div class="dashboard-container">
+      <div class="dashboard-header">
+        <button class="back-btn">← Back to Home</button>
+        <h2>Fresh Produce Marketplace</h2>
+      </div>
+      
+      <div class="search-box">
+        <input type="text" id="search" placeholder="Search products...">
+      </div>
 
-    <div class="seasonal-calendar">
-      <h3>Seasonal Calendar</h3>
-      <div class="calendar-months"></div>
-      <div class="seasonal-crops"></div>
-    </div>
+      <div class="seasonal-calendar">
+        <h3>Seasonal Calendar</h3>
+        <div class="calendar-months"></div>
+        <div class="seasonal-crops"></div>
+      </div>
 
-    <div class="products-list" id="buyer-products-list"></div>
+      <div class="products-list" id="buyer-products-list"></div>
 
-    <div class="cart">
-      <h3>Your Cart</h3>
-      <ul id="cart-items"></ul>
-      <p>Total: Ksh <span id="cart-total">0</span></p>
-      <div class="cart-actions">
-        <button id="proceed-to-payment" class="payment-btn">Proceed to Payment</button>
+      <div class="cart">
+        <h3>Your Cart</h3>
+        <ul id="cart-items"></ul>
+        <p>Total: <span id="cart-total">Ksh 0</span></p>
+        <div class="cart-actions">
+          <button id="proceed-to-payment" class="btn payment-btn">Proceed to Payment</button>
+        </div>
       </div>
     </div>
   </div>
@@ -92,7 +102,7 @@
             <option value="tubers">Tubers</option>
           </select>
         </div>
-        <button type="submit" class="primary-btn">Save Changes</button>
+        <button type="submit" class="btn primary-btn">Save Changes</button>
       </form>
     </div>
   </div>
