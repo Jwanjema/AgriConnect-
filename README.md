@@ -1,5 +1,10 @@
 # 🌱 AgriConnect Kenya
 
+## Demo Video
+
+[Watch the demo video.](https://drive.google.com/file/d/117LRWafYcxcJCm_1owDmIMqiHO6dWCnn/view?usp=sharing)
+
+
 **Direct from Kenyan farms to your table**
 
 ## Description
