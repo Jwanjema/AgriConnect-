@@ -1,4 +1,4 @@
-# AgriConnect Kenya
+# 🌱 AgriConnect Kenya
 
 **Direct from Kenyan farms to your table**
 
@@ -30,16 +30,17 @@ AgriConnect Kenya bridges the gap between small-scale Kenyan farmers and local b
 ### Setup Instructions
 1. Clone the repository
 
-2. Install dependencies:
+2. Open your VScode.
+
+3. Install dependencies:
 bash :
 - npm install -g json-server  # If not installed
-- Launch backend:
 
+4. Run the server:
 bash :
 - json-server --watch db.json
-- Open the app:
 
-2. Launch index.html in your browser
+5. Launch index.html in your browser
 
 - Test both farmer and buyer flows
 

@@ -1,6 +1,4 @@
-/* Complete CSS for AgriConnect Kenya - No Top Spacing Version */
 
-/* ========== BASE RESETS ========== */
 * {
   margin: 0;
   padding: 0;
@@ -19,7 +17,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ========== VIEW MANAGEMENT ========== */
 .view {
   width: 100%;
   min-height: 100vh;
@@ -33,7 +30,7 @@ body {
   display: block;
 }
 
-/* ========== LANDING PAGE ========== */
+
 #landing {
   display: flex;
   justify-content: center;
@@ -67,7 +64,7 @@ body {
   margin-top: 30px;
 }
 
-/* ========== COMMON DASHBOARD STYLES ========== */
+
 #farmer-view,
 #buyer-view {
   padding: 0;
@@ -104,7 +101,7 @@ body {
   color: #333;
 }
 
-/* ========== BUTTON STYLES ========== */
+
 .btn {
   padding: 12px 24px;
   font-size: 1rem;
@@ -159,7 +156,7 @@ body {
   margin-top: 15px;
 }
 
-/* ========== FARMER DASHBOARD ========== */
+
 #add-product-form {
   background: #f9f9f9;
   padding: 20px;
@@ -181,7 +178,7 @@ body {
   font-size: 1rem;
 }
 
-/* ========== PRODUCTS LIST ========== */
+
 .products-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -220,7 +217,7 @@ body {
   margin-top: 10px;
 }
 
-/* ========== BUYER MARKETPLACE ========== */
+
 .search-box {
   margin: 15px 0;
 }
@@ -233,7 +230,7 @@ body {
   font-size: 1rem;
 }
 
-/* ========== SEASONAL CALENDAR ========== */
+
 .seasonal-calendar {
   background: #f9f9f9;
   padding: 20px;
@@ -278,7 +275,7 @@ body {
   font-size: 0.9rem;
 }
 
-/* ========== CART ========== */
+
 .cart {
   background: #f9f9f9;
   padding: 20px;
@@ -291,12 +288,25 @@ body {
   margin: 15px 0;
 }
 
-#cart-items li {
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
+.cart-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.cart-item-name {
+  flex: 2;
+  padding-right: 15px;
+}
+
+.cart-item-price {
+  flex: 1;
+  text-align: right;
+  padding: 0 15px;
+  font-weight: bold;
+  color: #388e3c;
 }
 
 .remove-from-cart {
@@ -305,15 +315,19 @@ body {
   border: none;
   cursor: pointer;
   font-size: 0.9rem;
-  margin-left: 10px;
+}
+
+.remove-from-cart:hover {
+  text-decoration: underline;
 }
 
 #cart-total {
   font-weight: bold;
   color: #388e3c;
+  font-size: 1.2rem;
 }
 
-/* ========== MODAL ========== */
+
 .modal {
   position: fixed;
   top: 0;
@@ -370,7 +384,7 @@ body {
   border-radius: 4px;
 }
 
-/* ========== EMPTY STATES ========== */
+
 .empty-message {
   color: #666;
   font-style: italic;
@@ -379,7 +393,7 @@ body {
   grid-column: 1 / -1;
 }
 
-/* ========== RESPONSIVE ADJUSTMENTS ========== */
+
 @media (max-width: 768px) {
   .buttons {
     flex-direction: column;

@@ -1,328 +1,218 @@
-// Data
-let products = [];
-let farmerProducts = JSON.parse(localStorage.getItem('farmerProducts')) || [];
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+// AgriConnect Kenya - index.js
 
-// DOM Elements
-const landingPage = document.getElementById('landing');
-const farmerView = document.getElementById('farmer-view');
-const buyerView = document.getElementById('buyer-view');
-const farmerBtn = document.getElementById('farmer-btn');
-const buyerBtn = document.getElementById('buyer-btn');
-const backBtns = document.querySelectorAll('.back-btn');
-const productForm = document.getElementById('add-product-form');
-const farmerProductsList = document.getElementById('farmer-products-list');
-const buyerProductsList = document.getElementById('buyer-products-list');
-const searchInput = document.getElementById('search');
-const cartItems = document.getElementById('cart-items');
-const cartTotal = document.getElementById('cart-total');
-const editModal = document.getElementById('edit-modal');
-const closeBtn = document.querySelector('.close-btn');
-const editForm = document.getElementById('edit-product-form');
+const baseURL = "http://localhost:3000";
 
-// Kenyan Products Data
-const kenyanProducts = [
-  { id: 1, name: "Sukuma Wiki", price: 20, category: "vegetables", farmer: "Kamau's Farm" },
-  { id: 2, name: "Maize", price: 50, category: "grains", farmer: "Njeri's Shamba" },
-  { id: 3, name: "Avocado", price: 30, category: "fruits", farmer: "Mountain View Farm" },
-  { id: 4, name: "Irish Potatoes", price: 80, category: "tubers", farmer: "Highland Growers" },
-  { id: 5, name: "Tomatoes", price: 40, category: "vegetables", farmer: "Green Valley Farm" }
-];
-
-// Seasonal Calendar Data
-const seasonalCrops = {
-  january: ["Sukuma Wiki", "Carrots", "Onions"],
-  february: ["Spinach", "Cabbage", "Kale"],
-  march: ["Lettuce", "Broccoli", "Cauliflower"],
-  april: ["Peas", "Beans", "Spinach"],
-  may: ["Avocado", "Mangoes", "Pineapples"],
-  june: ["Tomatoes", "Onions", "Kale"],
-  july: ["Maize", "Beans", "Peas"],
-  august: ["Potatoes", "Carrots", "Cabbage"],
-  september: ["Sukuma Wiki", "Spinach", "Kale"],
-  october: ["Tomatoes", "Onions", "Peppers"],
-  november: ["Avocado", "Mangoes", "Bananas"],
-  december: ["Peas", "Beans", "Spinach"]
+// Views
+const views = {
+  landing: document.getElementById("landing"),
+  farmer: document.getElementById("farmer-view"),
+  buyer: document.getElementById("buyer-view"),
 };
 
-// Initialize the app
-document.addEventListener('DOMContentLoaded', () => {
-  loadProducts();
-  setupEventListeners();
-  showView('landing');
+function showView(view) {
+  Object.values(views).forEach((v) => v.classList.add("hidden"));
+  views[view].classList.remove("hidden");
+  views[view].classList.add("active");
+}
+
+// Navigation Buttons
+document.getElementById("farmer-btn").addEventListener("click", () => showView("farmer"));
+document.getElementById("buyer-btn").addEventListener("click", () => {
+  showView("buyer");
+  loadSeasonalCrops(new Date().toLocaleString("default", { month: "long" }));
 });
 
-// View Management
-function showView(viewName) {
-  // Hide all views
-  document.querySelectorAll('.view').forEach(view => {
-    view.classList.remove('active');
-    view.classList.add('hidden');
-  });
+document.querySelectorAll(".back-btn").forEach((btn) =>
+  btn.addEventListener("click", () => showView("landing"))
+);
 
-  // Show the requested view
-  const viewElement = document.getElementById(`${viewName}-view`) || document.getElementById(viewName);
-  if (viewElement) {
-    viewElement.classList.remove('hidden');
-    viewElement.classList.add('active');
-    
-    // Load appropriate data for the view
-    if (viewName === 'farmer') {
-      renderFarmerProducts();
-    } else if (viewName === 'buyer') {
-      renderProducts();
-      initCalendar();
-    }
-  }
+// Fetch Products
+async function fetchProducts() {
+  const res = await fetch(`${baseURL}/products`);
+  return res.json();
 }
 
-// Event Listeners
-function setupEventListeners() {
-  // Navigation
-  farmerBtn.addEventListener('click', () => showView('farmer'));
-  buyerBtn.addEventListener('click', () => showView('buyer'));
-  
-  backBtns.forEach(btn => {
-    btn.addEventListener('click', () => showView('landing'));
-  });
-
-  // Forms
-  productForm.addEventListener('submit', handleAddProduct);
-  editForm.addEventListener('submit', handleEditProduct);
-
-  // Search
-  searchInput.addEventListener('input', filterProducts);
-
-  // Modal
-  closeBtn.addEventListener('click', () => editModal.classList.add('hidden'));
-  window.addEventListener('click', (e) => {
-    if (e.target === editModal) editModal.classList.add('hidden');
-  });
-
-  // Payment
-  document.getElementById('proceed-to-payment').addEventListener('click', handlePayment);
-}
-
-// Product Management
-function loadProducts() {
-  // Try to fetch from db.json first
-  fetch('http://localhost:3000/products')
-    .then(response => response.json())
-    .then(data => {
-      products = data;
-      renderProducts();
-    })
-    .catch(() => {
-      products = kenyanProducts;
-      renderProducts();
-    });
-}
-
-function handleAddProduct(e) {
-  e.preventDefault();
-  
-  const newProduct = {
-    id: Date.now(),
-    name: document.getElementById('product-name').value,
-    price: parseInt(document.getElementById('product-price').value),
-    category: document.getElementById('product-category').value,
-    farmer: "Your Farm"
-  };
-  
-  farmerProducts.push(newProduct);
-  saveFarmerProducts();
-  e.target.reset();
-  renderFarmerProducts();
-}
-
-function saveFarmerProducts() {
-  localStorage.setItem('farmerProducts', JSON.stringify(farmerProducts));
-}
-
-function renderFarmerProducts() {
-  if (farmerProducts.length === 0) {
-    farmerProductsList.innerHTML = '<p class="empty-message">You haven\'t added any products yet</p>';
-    return;
-  }
-  
-  farmerProductsList.innerHTML = farmerProducts.map(product => `
-    <div class="product-card" data-id="${product.id}">
+// Render Farmer Products
+const farmerList = document.getElementById("farmer-products-list");
+function renderFarmerProducts(products) {
+  farmerList.innerHTML = "";
+  products.forEach((product) => {
+    const div = document.createElement("div");
+    div.className = "product-card";
+    div.innerHTML = `
       <h3>${product.name}</h3>
       <p class="price">Ksh ${product.price}</p>
       <p class="category">${product.category}</p>
       <div class="product-actions">
-        <button class="edit-btn" onclick="openEditModal(${product.id})">Edit</button>
-        <button class="delete-btn" onclick="deleteProduct(${product.id})">Delete</button>
+        <button class="btn edit-btn" data-id="${product.id}">Edit</button>
+        <button class="btn delete-btn" data-id="${product.id}">Delete</button>
       </div>
-    </div>
-  `).join('');
+    `;
+    farmerList.appendChild(div);
+  });
 }
 
-function openEditModal(productId) {
-  const product = farmerProducts.find(p => p.id === productId);
-  if (!product) return;
-
-  document.getElementById('edit-product-id').value = product.id;
-  document.getElementById('edit-product-name').value = product.name;
-  document.getElementById('edit-product-price').value = product.price;
-  document.getElementById('edit-product-category').value = product.category;
-  
-  editModal.classList.remove('hidden');
-}
-
-function handleEditProduct(e) {
+// Add Product
+const addProductForm = document.getElementById("add-product-form");
+addProductForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  
-  const productId = parseInt(document.getElementById('edit-product-id').value);
-  const updatedProduct = {
-    id: productId,
-    name: document.getElementById('edit-product-name').value,
-    price: parseInt(document.getElementById('edit-product-price').value),
-    category: document.getElementById('edit-product-category').value,
-    farmer: "Your Farm"
-  };
-  
-  const index = farmerProducts.findIndex(p => p.id === productId);
-  if (index !== -1) {
-    farmerProducts[index] = updatedProduct;
-    saveFarmerProducts();
-    renderFarmerProducts();
-    renderProducts();
-    editModal.classList.add('hidden');
-  }
-}
+  const name = document.getElementById("product-name").value.trim();
+  const price = parseInt(document.getElementById("product-price").value);
+  const category = document.getElementById("product-category").value;
 
-function deleteProduct(productId) {
-  if (confirm("Are you sure you want to delete this product?")) {
-    farmerProducts = farmerProducts.filter(p => p.id !== productId);
-    saveFarmerProducts();
-    renderFarmerProducts();
-    renderProducts();
+  await fetch(`${baseURL}/products`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, price, category }),
+  });
+
+  addProductForm.reset();
+  const updated = await fetchProducts();
+  renderFarmerProducts(updated);
+});
+
+// Edit/Delete Handlers
+farmerList.addEventListener("click", async (e) => {
+  const id = e.target.dataset.id;
+  if (e.target.classList.contains("edit-btn")) {
+    const product = await fetch(`${baseURL}/products/${id}`).then((r) => r.json());
+    document.getElementById("edit-product-id").value = product.id;
+    document.getElementById("edit-product-name").value = product.name;
+    document.getElementById("edit-product-price").value = product.price;
+    document.getElementById("edit-product-category").value = product.category;
+    document.getElementById("edit-modal").classList.remove("hidden");
+  } else if (e.target.classList.contains("delete-btn")) {
+    await fetch(`${baseURL}/products/${id}`, { method: "DELETE" });
+    const updated = await fetchProducts();
+    renderFarmerProducts(updated);
   }
-}
+});
+
+document.getElementById("edit-product-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const id = document.getElementById("edit-product-id").value;
+  const name = document.getElementById("edit-product-name").value;
+  const price = parseInt(document.getElementById("edit-product-price").value);
+  const category = document.getElementById("edit-product-category").value;
+
+  await fetch(`${baseURL}/products/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, price, category }),
+  });
+
+  document.getElementById("edit-modal").classList.add("hidden");
+  const updated = await fetchProducts();
+  renderFarmerProducts(updated);
+});
+
+document.querySelector(".close-btn").addEventListener("click", () => {
+  document.getElementById("edit-modal").classList.add("hidden");
+});
 
 // Buyer Marketplace
-function renderProducts() {
-  const allProducts = [...products, ...farmerProducts];
-  
-  if (allProducts.length === 0) {
-    buyerProductsList.innerHTML = '<p class="empty-message">No products available in the marketplace</p>';
-    return;
-  }
-  
-  buyerProductsList.innerHTML = allProducts.map(product => `
-    <div class="product-card" data-id="${product.id}">
+const buyerList = document.getElementById("buyer-products-list");
+function renderBuyerProducts(products) {
+  buyerList.innerHTML = "";
+  products.forEach((product) => {
+    const div = document.createElement("div");
+    div.className = "product-card";
+    div.innerHTML = `
       <h3>${product.name}</h3>
       <p class="price">Ksh ${product.price}</p>
-      <p class="category">${product.category} • ${product.farmer}</p>
-      <button class="add-to-cart">Add to Cart</button>
-    </div>
-  `).join('');
-  
-  // Add to cart event listeners
-  document.querySelectorAll('.add-to-cart').forEach(button => {
-    button.addEventListener('click', (e) => {
-      const productId = parseInt(e.target.closest('.product-card').dataset.id);
-      const product = [...products, ...farmerProducts].find(p => p.id === productId);
-      addToCart(product);
-    });
+      <p class="category">${product.category}</p>
+      <button class="btn add-to-cart" data-id="${product.id}">Add to Cart</button>
+    `;
+    buyerList.appendChild(div);
   });
 }
 
-function filterProducts() {
-  const searchTerm = searchInput.value.toLowerCase();
-  const filtered = [...products, ...farmerProducts].filter(product => 
-    product.name.toLowerCase().includes(searchTerm) || 
-    product.category.toLowerCase().includes(searchTerm)
-  );
-  
-  buyerProductsList.innerHTML = filtered.length === 0 ? 
-    '<p class="empty-message">No matching products found</p>' :
-    filtered.map(product => `
-      <div class="product-card" data-id="${product.id}">
-        <h3>${product.name}</h3>
-        <p class="price">Ksh ${product.price}</p>
-        <p class="category">${product.category} • ${product.farmer}</p>
-        <button class="add-to-cart">Add to Cart</button>
-      </div>
-    `).join('');
-}
-
-// Seasonal Calendar
-function initCalendar() {
-  const monthsContainer = document.querySelector('.calendar-months');
-  monthsContainer.innerHTML = '';
-  
-  Object.keys(seasonalCrops).forEach(month => {
-    const button = document.createElement('button');
-    button.textContent = month.charAt(0).toUpperCase() + month.slice(1);
-    button.addEventListener('click', () => showCropsForMonth(month));
-    monthsContainer.appendChild(button);
-  });
-  
-  // Show current month by default
-  const currentMonth = new Date().toLocaleString('default', { month: 'long' }).toLowerCase();
-  showCropsForMonth(currentMonth);
-}
-
-function showCropsForMonth(month) {
-  const cropsContainer = document.querySelector('.seasonal-crops');
-  cropsContainer.innerHTML = seasonalCrops[month].map(crop => `
-    <div class="seasonal-crop">${crop}</div>
-  `).join('');
-}
-
-// Cart Management
-function addToCart(product) {
-  const existingItem = cart.find(item => item.id === product.id);
-  
-  if (existingItem) {
-    existingItem.quantity = (existingItem.quantity || 1) + 1;
-  } else {
-    cart.push({ ...product, quantity: 1 });
-  }
-  
-  saveCart();
-  updateCart();
-}
-
-function removeFromCart(index) {
-  cart.splice(index, 1);
-  saveCart();
-  updateCart();
-}
-
-function saveCart() {
-  localStorage.setItem('cart', JSON.stringify(cart));
-}
+// Cart
+let cart = [];
+const cartItems = document.getElementById("cart-items");
+const cartTotal = document.getElementById("cart-total");
 
 function updateCart() {
-  cartItems.innerHTML = cart.length === 0 ? 
-    '<li class="empty-message">Your cart is empty</li>' :
-    cart.map((item, index) => `
-      <li>
-        <span>${item.name} ${item.quantity > 1 ? `(×${item.quantity})` : ''}</span>
-        <span>Ksh ${item.price * (item.quantity || 1)}</span>
-        <button class="remove-from-cart" onclick="removeFromCart(${index})">Remove</button>
-      </li>
-    `).join('');
-  
-  const total = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+  cartItems.innerHTML = "";
+  let total = 0;
+  cart.forEach((item, index) => {
+    total += item.price;
+    const li = document.createElement("li");
+    li.className = "cart-item";
+    li.innerHTML = `
+      <span class="cart-item-name">${item.name}</span>
+      <span class="cart-item-price">Ksh ${item.price}</span>
+      <button class="remove-from-cart" data-index="${index}">Remove</button>
+    `;
+    cartItems.appendChild(li);
+  });
   cartTotal.textContent = `Ksh ${total}`;
 }
 
-function handlePayment() {
-  if (cart.length === 0) {
-    alert("Your cart is empty! Add some products first.");
-  } else {
-    alert(`Payment of ${cartTotal.textContent} processed successfully!`);
-    cart = [];
-    saveCart();
+buyerList.addEventListener("click", async (e) => {
+  if (e.target.classList.contains("add-to-cart")) {
+    const id = e.target.dataset.id;
+    const product = await fetch(`${baseURL}/products/${id}`).then((r) => r.json());
+    cart.push(product);
     updateCart();
   }
+});
+
+cartItems.addEventListener("click", (e) => {
+  if (e.target.classList.contains("remove-from-cart")) {
+    const index = e.target.dataset.index;
+    cart.splice(index, 1);
+    updateCart();
+  }
+});
+
+// Payment Simulation
+const paymentBtn = document.getElementById("proceed-to-payment");
+paymentBtn.addEventListener("click", () => {
+  if (cart.length === 0) return alert("Your cart is empty!");
+  alert("✅ Payment successful! Thank you for shopping with AgriConnect Kenya.");
+  cart = [];
+  updateCart();
+});
+
+// Seasonal Calendar (Kenyan Crops)
+const calendarMonths = document.querySelector(".calendar-months");
+const seasonalCropsContainer = document.querySelector(".seasonal-crops");
+
+const cropsByMonth = {
+  January: ["Sukuma Wiki", "Maize", "Mangoes"],
+  February: ["Spinach", "Cabbage", "Passion Fruits"],
+  March: ["Tomatoes", "Onions", "Maize"],
+  April: ["Carrots", "Beetroot", "Kales"],
+  May: ["Green Beans", "Avocados", "Cabbage"],
+  June: ["Maize", "Pineapples", "Irish Potatoes"],
+  July: ["Sukuma Wiki", "Spinach", "Sweet Potatoes"],
+  August: ["Onions", "Watermelon", "Beans"],
+  September: ["Mangoes", "Tomatoes", "Pumpkins"],
+  October: ["Carrots", "Passion Fruits", "Cabbage"],
+  November: ["Kales", "Avocados", "Maize"],
+  December: ["Spinach", "Sweet Potatoes", "Bananas"],
+};
+
+Object.keys(cropsByMonth).forEach((month) => {
+  const btn = document.createElement("button");
+  btn.textContent = month;
+  btn.addEventListener("click", () => loadSeasonalCrops(month));
+  calendarMonths.appendChild(btn);
+});
+
+function loadSeasonalCrops(month) {
+  document.querySelectorAll(".calendar-months button").forEach((b) => b.classList.remove("active"));
+  const activeBtn = Array.from(document.querySelectorAll(".calendar-months button")).find(b => b.textContent === month);
+  if (activeBtn) activeBtn.classList.add("active");
+  const crops = cropsByMonth[month] || [];
+  seasonalCropsContainer.innerHTML = crops
+    .map((crop) => `<div class="seasonal-crop">${crop}</div>`)
+    .join("");
 }
 
-// Make functions available globally
-window.openEditModal = openEditModal;
-window.deleteProduct = deleteProduct;
-window.removeFromCart = removeFromCart;
+// Initial Load
+fetchProducts().then((data) => {
+  renderFarmerProducts(data);
+  renderBuyerProducts(data);
+});

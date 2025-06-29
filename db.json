@@ -1,39 +1,68 @@
 {
   "products": [
     {
-      "id": 1,
-      "name": "Sukuma Wiki",
-      "price": 20,
-      "category": "vegetables",
-      "farmer": "Kamau's Farm"
+      "id": "82f2",
+      "name": "1 Gunia of Potatoes",
+      "price": 3000,
+      "category": "vegetables"
     },
     {
-      "id": 2,
-      "name": "Maize",
-      "price": 50,
-      "category": "grains",
-      "farmer": "Njeri's Shamba"
+      "id": "eea6",
+      "name": "1KG of onions",
+      "price": 1000,
+      "category": "vegetables"
     },
     {
-      "id": 3,
-      "name": "Avocado",
-      "price": 30,
-      "category": "fruits",
-      "farmer": "Mountain View Farm"
+      "id": "b15c",
+      "name": "1kg of Apples",
+      "price": 500,
+      "category": "fruits"
     },
     {
-      "id": 4,
-      "name": "Irish Potatoes",
-      "price": 80,
-      "category": "tubers",
-      "farmer": "Highland Growers"
+      "id": "9aff",
+      "name": "1KG of Ndengu",
+      "price": 300,
+      "category": "grains"
     },
     {
-      "id": 5,
-      "name": "Tomatoes",
-      "price": 40,
-      "category": "vegetables",
-      "farmer": "Green Valley Farm"
+      "id": "f545",
+      "name": "1Kg of Oranges",
+      "price": 250,
+      "category": "fruits"
+    },
+    {
+      "id": "07f8",
+      "name": "1KG of corriander",
+      "price": 100,
+      "category": "vegetables"
     }
-  ]
+  ],
+  "cart": [],
+  "calendar": {
+    "January": [
+      "Kale",
+      "Spinach",
+      "Cabbage"
+    ],
+    "February": [
+      "Maize",
+      "Beans"
+    ],
+    "March": [
+      "Tomatoes",
+      "Onions"
+    ],
+    "April": [
+      "Sweet Potatoes",
+      "Carrots"
+    ],
+    "May": [
+      "Peas",
+      "Chillies"
+    ],
+    "June": [
+      "Pumpkin",
+      "Lettuce"
+    ]
+  }
 }
